@@ -2,9 +2,22 @@
 
 
 import argparse
+import os
 from configparser import ConfigParser
+from string import Template
+from textwrap import dedent
 
 import psycopg2
+
+ENTRY_TEMPLATE = Template(
+    dedent(
+        """
+    repo.url=$name
+    repo.path=$path
+    repo.desc=$desc
+    """
+    )
+)
 
 
 def get_args():
@@ -41,15 +54,26 @@ def get_owners(db_conn):
 
 def get_repos(db_conn):
     with db_conn.cursor() as cursor:
-        cursor.execute("SELECT lower_name, description, owner_id from repository where is_private = false;")
+        cursor.execute(
+            "SELECT lower_name, description, owner_id from repository where is_private = false;"
+        )
         return cursor.fetchall()
 
 
 if __name__ == "__main__":
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
+    repo_root = gitea_config["repository"]["ROOT"]
     with get_db_connection(get_database_credentials(gitea_config)) as db_conn:
         owners = get_owners(db_conn)
         print("Got {} owners".format(len(owners)))
         repos = get_repos(db_conn)
         print("Got {} repos".format(len(repos)))
+    for name, description, owner_id in repos:
+        repo_ident = os.path.join(owners[owner_id], name)
+        print("Exporting", repo_ident)
+        path = os.path.join(repo_root, repo_ident + ".git")
+        assert os.path.exists(path)
+        args.output_file.write(
+            ENTRY_TEMPLATE.substitute(name=name, path=path, desc=description)
+        )
