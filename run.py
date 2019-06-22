@@ -4,6 +4,8 @@
 import argparse
 from configparser import ConfigParser
 
+import psycopg2
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -27,7 +29,12 @@ def get_database_credentials(gitea_config):
     }
 
 
+def get_db_connection(db_credentials):
+    return psycopg2.connect(**db_credentials)
+
+
 if __name__ == "__main__":
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
-    print(get_database_credentials(gitea_config))
+    db_conn = get_db_connection(get_database_credentials(gitea_config))
+    db_conn.close()
