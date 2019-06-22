@@ -33,8 +33,15 @@ def get_db_connection(db_credentials):
     return psycopg2.connect(**db_credentials)
 
 
+def get_owners(db_conn):
+    with db_conn.cursor() as cursor:
+        cursor.execute('SELECT id, lower_name FROM "user"')
+        return dict(cursor.fetchall())
+
+
 if __name__ == "__main__":
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
-    db_conn = get_db_connection(get_database_credentials(gitea_config))
-    db_conn.close()
+    with get_db_connection(get_database_credentials(gitea_config)) as db_conn:
+        owners = get_owners(db_conn)
+    print("Got {} owners".format(owners))
