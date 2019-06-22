@@ -35,8 +35,14 @@ def get_db_connection(db_credentials):
 
 def get_owners(db_conn):
     with db_conn.cursor() as cursor:
-        cursor.execute('SELECT id, lower_name FROM "user"')
+        cursor.execute('SELECT id, lower_name FROM "user";')
         return dict(cursor.fetchall())
+
+
+def get_repos(db_conn):
+    with db_conn.cursor() as cursor:
+        cursor.execute("SELECT lower_name, description, owner_id from repository where is_private = false;")
+        return cursor.fetchall()
 
 
 if __name__ == "__main__":
@@ -45,3 +51,5 @@ if __name__ == "__main__":
     with get_db_connection(get_database_credentials(gitea_config)) as db_conn:
         owners = get_owners(db_conn)
         print("Got {} owners".format(len(owners)))
+        repos = get_repos(db_conn)
+        print("Got {} repos".format(len(repos)))
