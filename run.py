@@ -9,6 +9,7 @@ from string import Template
 from textwrap import dedent
 
 import psycopg2
+import sentry_sdk
 
 ENTRY_TEMPLATE = Template(
     dedent(
@@ -62,6 +63,7 @@ def get_repos(db_conn):
 
 
 if __name__ == "__main__":
+    sentry_sdk.init(os.environ.get("SENTRY_SDK"))
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
     repo_root = gitea_config["repository"]["ROOT"]
