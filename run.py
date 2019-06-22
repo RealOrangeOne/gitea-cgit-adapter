@@ -44,4 +44,4 @@ if __name__ == "__main__":
     gitea_config = read_gitea_config(args.gitea_config)
     with get_db_connection(get_database_credentials(gitea_config)) as db_conn:
         owners = get_owners(db_conn)
-    print("Got {} owners".format(owners))
+        print("Got {} owners".format(len(owners)))
