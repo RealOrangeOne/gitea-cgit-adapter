@@ -2,6 +2,7 @@
 
 
 import argparse
+from configparser import ConfigParser
 
 
 def get_args():
@@ -11,5 +12,22 @@ def get_args():
     return parser.parse_args()
 
 
+def read_gitea_config(gitea_config_file):
+    config = ConfigParser()
+    config.read_string("[root]\n" + gitea_config_file.read())
+    return config
+
+
+def get_database_credentials(gitea_config):
+    database_config = gitea_config["database"]
+    return {
+        "dbname": database_config["name"],
+        "user": database_config["user"],
+        "password": database_config["passwd"],
+    }
+
+
 if __name__ == "__main__":
-    print(get_args())
+    args = get_args()
+    gitea_config = read_gitea_config(args.gitea_config)
+    print(get_database_credentials(gitea_config))
