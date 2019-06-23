@@ -10,6 +10,7 @@ from textwrap import dedent
 
 import psycopg2
 import sentry_sdk
+from dotenv import load_dotenv
 
 ENTRY_TEMPLATE = Template(
     dedent(
@@ -65,6 +66,7 @@ def get_repos(db_conn):
 
 
 if __name__ == "__main__":
+    load_dotenv()
     sentry_sdk.init(os.environ.get("SENTRY_SDK"))
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
