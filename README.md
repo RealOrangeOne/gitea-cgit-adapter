@@ -1,5 +1,7 @@
 # gitea-cgit-adapter
 
+![](https://github.com/realorangeone/gitea-cgit-adapter/workflows/Main/badge.svg)
+
 Export public gitea repos in a way cgit understands
 
 ## Installation
