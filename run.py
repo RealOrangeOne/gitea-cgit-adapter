@@ -5,24 +5,15 @@ import argparse
 import datetime
 import os
 from configparser import ConfigParser
+from pathlib import Path
 from string import Template
-from textwrap import dedent
 
 import psycopg2
 import sentry_sdk
 from dotenv import load_dotenv
 
-ENTRY_TEMPLATE = Template(
-    dedent(
-        """
-    repo.url=$name
-    repo.path=$path
-    repo.desc=$desc
-    repo.homepage=$website
-    repo.owner=$owner
-    """
-    )
-)
+TEMPLATE_PATH = Path(__file__).parent.resolve().joinpath("cgit-template.txt")
+ENTRY_TEMPLATE = Template(TEMPLATE_PATH.read_text())
 
 
 def get_args():

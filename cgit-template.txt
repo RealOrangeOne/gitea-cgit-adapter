@@ -1,0 +1,5 @@
+repo.url=$name
+repo.path=$path
+repo.desc=$desc
+repo.homepage=$website
+repo.owner=$owner
