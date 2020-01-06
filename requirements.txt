@@ -1,3 +1,4 @@
+coloredlogs==10.0
 psycopg2-binary==2.8.4
 python-dotenv==0.10.3
 sentry-sdk==0.9.1
