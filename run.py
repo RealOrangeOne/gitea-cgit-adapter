@@ -48,7 +48,7 @@ def get_repos(gitea_url):
             yield from data
 
 
-def main(gitea_config, output_file):
+def save_gitea_repos(gitea_config, output_file):
     repo_root = gitea_config["repository"]["ROOT"]
     repo_configs = []
     for repo in get_repos(gitea_config["server"]["ROOT_URL"]):
@@ -71,7 +71,7 @@ def main(gitea_config, output_file):
         output_file.write(repo_config + "\n")
 
 
-if __name__ == "__main__":
+def main():
     coloredlogs.install(
         level=logging.INFO,
         fmt="%(asctime)s %(levelname)s %(message)s",
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     sentry_sdk.init(os.environ.get("SENTRY_SDK"))
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
-    main(gitea_config, args.output_file)
+    save_gitea_repos(gitea_config, args.output_file)
     if args.interval:
         while True:
             args.output_file.flush()
@@ -90,4 +90,8 @@ if __name__ == "__main__":
             time.sleep(args.interval)
 
             gitea_config = read_gitea_config(args.gitea_config)
-            main(gitea_config, args.output_file)
+            save_gitea_repos(gitea_config, args.output_file)
+
+
+if __name__ == "__main__":
+    main()
