@@ -22,7 +22,7 @@ ENTRY_TEMPLATE = Template(TEMPLATE_PATH.read_text())
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("gitea_config", type=argparse.FileType("r"))
-    parser.add_argument("output_file", type=argparse.FileType("w"))
+    parser.add_argument("output_file", type=Path)
     parser.add_argument("--interval", type=int, default=0)
     return parser.parse_args()
 
@@ -47,7 +47,7 @@ def get_repos(gitea_url):
             yield from data
 
 
-def save_gitea_repos(gitea_config, output_file):
+def save_gitea_repos(gitea_config, output_file: Path):
     try:
         repo_root = gitea_config["repository"]["ROOT"]
         repo_configs = []
@@ -64,7 +64,7 @@ def save_gitea_repos(gitea_config, output_file):
             )
 
         logging.info("Writing repos to %s", output_file.name)
-        output_file.writelines(repo_configs)
+        output_file.write_text("\n".join(repo_configs))
     except Exception:
         logging.exception("Failed to save repos")
 
@@ -83,8 +83,6 @@ def main():
     time.sleep(args.interval)
     if args.interval:
         while True:
-            args.output_file.flush()
-            args.output_file.seek(0)
             save_gitea_repos(gitea_config, args.output_file)
             time.sleep(args.interval)
 
