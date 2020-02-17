@@ -79,8 +79,11 @@ def main():
     save_gitea_repos(gitea_config, args.output_file)
     if args.interval:
         while True:
-            time.sleep(args.interval)
-            save_gitea_repos(gitea_config, args.output_file)
+            try:
+                time.sleep(args.interval)
+                save_gitea_repos(gitea_config, args.output_file)
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":
