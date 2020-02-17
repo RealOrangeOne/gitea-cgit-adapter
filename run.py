@@ -84,7 +84,6 @@ def main():
 
             time.sleep(args.interval)
 
-            gitea_config = read_gitea_config(args.gitea_config)
             save_gitea_repos(gitea_config, args.output_file)
 
 
