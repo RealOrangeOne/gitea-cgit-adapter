@@ -76,16 +76,16 @@ def main():
     sentry_sdk.init(os.environ.get("SENTRY_SDK"))
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
-    save_gitea_repos(gitea_config, args.output_file)
-    if args.interval:
-        while True:
-            try:
-                args.output_file.flush()
-                args.output_file.seek(0)
-                time.sleep(args.interval)
-                save_gitea_repos(gitea_config, args.output_file)
-            except Exception:
-                pass
+    while True:
+        try:
+            args.output_file.flush()
+            args.output_file.seek(0)
+            time.sleep(args.interval)
+            save_gitea_repos(gitea_config, args.output_file)
+            if not args.interval:
+                return
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
