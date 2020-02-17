@@ -79,11 +79,7 @@ def main():
     save_gitea_repos(gitea_config, args.output_file)
     if args.interval:
         while True:
-            args.output_file.flush()
-            args.output_file.seek(0)
-
             time.sleep(args.interval)
-
             save_gitea_repos(gitea_config, args.output_file)
 
 
