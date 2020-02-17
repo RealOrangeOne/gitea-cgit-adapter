@@ -48,22 +48,25 @@ def get_repos(gitea_url):
 
 
 def save_gitea_repos(gitea_config, output_file):
-    repo_root = gitea_config["repository"]["ROOT"]
-    repo_configs = []
-    for repo in get_repos(gitea_config["server"]["ROOT_URL"]):
-        logging.info("Exporting %s", repo["full_name"])
-        repo_configs.append(
-            ENTRY_TEMPLATE.substitute(
-                name=repo["name"],
-                path=os.path.join(repo_root, repo["full_name"]) + ".git",
-                desc=repo["description"],
-                website=repo["website"],
-                owner=repo["owner"]["full_name"] or repo["owner"]["login"],
+    try:
+        repo_root = gitea_config["repository"]["ROOT"]
+        repo_configs = []
+        for repo in get_repos(gitea_config["server"]["ROOT_URL"]):
+            logging.info("Exporting %s", repo["full_name"])
+            repo_configs.append(
+                ENTRY_TEMPLATE.substitute(
+                    name=repo["name"],
+                    path=os.path.join(repo_root, repo["full_name"]) + ".git",
+                    desc=repo["description"],
+                    website=repo["website"],
+                    owner=repo["owner"]["full_name"] or repo["owner"]["login"],
+                )
             )
-        )
 
-    logging.info("Writing repos to %s", output_file.name)
-    output_file.writelines(repo_configs)
+        logging.info("Writing repos to %s", output_file.name)
+        output_file.writelines(repo_configs)
+    except Exception:
+        logging.exception("Failed to save repos")
 
 
 def main():
@@ -76,16 +79,14 @@ def main():
     sentry_sdk.init(os.environ.get("SENTRY_SDK"))
     args = get_args()
     gitea_config = read_gitea_config(args.gitea_config)
-    while True:
-        try:
+    save_gitea_repos(gitea_config, args.output_file)
+    time.sleep(args.interval)
+    if args.interval:
+        while True:
             args.output_file.flush()
             args.output_file.seek(0)
-            time.sleep(args.interval)
             save_gitea_repos(gitea_config, args.output_file)
-            if not args.interval:
-                return
-        except Exception:
-            pass
+            time.sleep(args.interval)
 
 
 if __name__ == "__main__":
