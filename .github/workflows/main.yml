@@ -1,6 +1,6 @@
 name: Main
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -19,5 +19,11 @@ jobs:
       run: pip install -r requirements.txt
     - name: Run tests
       run: ./scripts/test.sh
-    - name: Build docker image
-      run: docker build .
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build docker image
+        run: docker build .
+      - name: Show image info
+        run: docker images
